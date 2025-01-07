@@ -1,0 +1,16 @@
+{
+    "in": "∈",
+    "forall": "∀",
+    "thereexists": "∃",
+    "or": "∨",
+    "and": "∧",
+    "implies": "⇒",
+    "iff": "⇔",
+    "emptyset": "∅",
+    "epsilon": "ε",
+    "notin": "∉",
+    "natural": "ℕ",
+    "integers": "ℤ",
+    "real": "ℝ",
+    "subset": "⊆"
+}
