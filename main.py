@@ -44,23 +44,67 @@ allLetters = [
     '[', ']', '{', '}', '|', '\\', ';', ':', "'", '"', ',', '.', '/', '?', '`', '~'
 ]
 
+# Dictionary for all available superscripts
+SUPERSCRIPT_MAP = str.maketrans(
+    "0123456789abdefghijklmnoprstuvwxyzABDEGHIJKLMNOPRTUVW+-=()",
+    "⁰¹²³⁴⁵⁶⁷⁸⁹ᵃᵇᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᴿᵀᵁⱽᵂ⁺⁻⁼⁽⁾"
+)
+
+# Dictionary for all available subscripts
+SUBSCRIPT_MAP = str.maketrans(
+    "0123456789aehlmnopst+-=()",
+    "₀₁₂₃₄₅₆₇₈₉ₐₑₕₗₘₙₒₚₛₜ₊₋₌₍₎"
+)
+
 def getSpecialCharacter(combo):
     def formatString(string):
-        filtered_str = ''.join(filter(str.isalpha, string)).lower() # Filter all characters that are not letters, and then convert to lower case
-        return filtered_str
+        allowedChars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-=()")
+        filteredString = ''.join(char for char in string if char in allowedChars).lower()  # Allow letters, numbers, and allowed punctuation. convert to lowercase
+        print(filteredString)
 
-    try:
-        with open("dictionary.json", encoding="utf-8") as file:
-            dictionary = json.load(file)
-            specialCharacter = dictionary[formatString(combo)]
+        if "power" in string:
+            filteredString = filteredString.replace("power", "")
 
-        print(specialCharacter)
+        elif "sub" in string:
+            filteredString = filteredString.replace("sub", "")
 
-        keyboardPresser.type('\b' * (len(combo) + 2)) # type backspaces to remove what the user typed
-        keyboardPresser.type(specialCharacter)
+        return filteredString
 
-    except KeyError:
-        print("invalid character: " + combo)
+    # Types the powers separately from regular characters because they use a different dictionary
+    if "power" in combo:
+        filteredString = formatString(combo)
+
+        specialCharacter = filteredString.translate(SUPERSCRIPT_MAP)
+        if filteredString == specialCharacter:
+            print("Not in map")
+        else:
+            keyboardPresser.type('\b' * (len(combo) + 2))  # type backspaces to remove what the user typed
+            keyboardPresser.type(specialCharacter)
+
+    # Types the subsets separately from regular characters because they use a different dictionary
+    elif "sub" in combo:
+        filteredString = formatString(combo)
+
+        specialCharacter = filteredString.translate(SUBSCRIPT_MAP)
+        if filteredString == specialCharacter:
+            print("Not in map")
+        else:
+            keyboardPresser.type('\b' * (len(combo) + 2))  # type backspaces to remove what the user typed
+            keyboardPresser.type(specialCharacter)
+
+    else:
+        try:
+            with open("dictionary.json", encoding="utf-8") as file:
+                dictionary = json.load(file)
+                specialCharacter = dictionary[formatString(combo)]
+
+            print(specialCharacter)
+
+            keyboardPresser.type('\b' * (len(combo) + 2)) # type backspaces to remove what the user typed
+            keyboardPresser.type(specialCharacter)
+
+        except KeyError:
+            print("invalid character: " + combo)
 
 
 def onPress(key):
